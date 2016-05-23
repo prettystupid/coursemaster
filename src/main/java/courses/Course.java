@@ -16,6 +16,15 @@ public class Course {
         this.mistakesAllowed = mistakesAllowed;
     }
 
+    public Course (Course course) {
+        id = course.getId();
+        uuid = course.getUuid();
+        version = course.getVersion();
+        name = course.getName();
+        mistakesAllowed = course.getMistakesAllowed();
+
+    }
+
     public long getId() {
         return id;
     }
@@ -54,5 +63,9 @@ public class Course {
 
     public void setMistakesAllowed(int mistakesAllowed) {
         this.mistakesAllowed = mistakesAllowed;
+    }
+
+    public boolean equals(Course course){
+        return (id == course.getId())&&(uuid.equals(course.getUuid()))&&(version == course.getVersion())&&(name.equals(course.getName()))&&(mistakesAllowed == course.getMistakesAllowed());
     }
 }

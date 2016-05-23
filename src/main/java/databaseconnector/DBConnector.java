@@ -47,6 +47,28 @@ public class DBConnector {
         return courses;
     }
 
+    public static Course getCourse(String uuid, int version) {
+        Connection connection = getConnection();
+
+        long id = getId(uuid, version);
+        Course course = null;
+        String query = "SELECT * FROM `courses` WHERE ID =" + id;
+        Statement statement;
+        ResultSet resultSet;
+
+        try {
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(query);
+            if (resultSet.next()) {
+                course = new Course(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return course;
+    }
+
     public static void insertCourse(CourseInfo courseInfo, String uuid, int version) {
         try {
             Connection connection = getConnection();
@@ -125,10 +147,29 @@ public class DBConnector {
                 JOptionPane.showMessageDialog(null, "Курс не найден.", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String query = "DELETE FROM `questions` WHERE COURSE_ID=" + id;
+            String query = "DELETE FROM `questions` WHERE COURSE_ID = " + id;
             statement.execute(query);
-            query = "DELETE FROM `courses` WHERE ID=" + id;
+            query = "DELETE FROM `courses` WHERE ID = " + id;
             statement.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateCourse(Course course) {
+        if (findMatches(course.getUuid(), course.getVersion()) != 0) {
+            JOptionPane.showMessageDialog(null, "Данная версия уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Connection connection = getConnection();
+        try {
+            String query = "UPDATE `courses` SET UUID = ?, VERSION = ?, NAME = ? WHERE ID = " +course.getId();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, course.getUuid());
+            statement.setInt(2, course.getVersion());
+            statement.setString(3, course.getName());
+            statement.execute();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

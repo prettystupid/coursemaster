@@ -12,9 +12,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class WindowApp extends JFrame {
-
-
-
     JTable table;
     JPanel buttonPanel;
     JButton uploadCourseButton;
@@ -36,7 +33,12 @@ public class WindowApp extends JFrame {
                 new String [] {
                         "UUID", "Version", "Name"
                 }
-        ));
+        )   {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        });
         final DefaultTableModel model = (DefaultTableModel) table.getModel();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -76,7 +78,7 @@ public class WindowApp extends JFrame {
         updateCourseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
-                    updateCourse((String) model.getValueAt(table.getSelectedRow(), 0),  model.getValueAt(table.getSelectedRow(), 1).toString(), (String) model.getValueAt(table.getSelectedRow(), 2));
+                    updateCourse((String) model.getValueAt(table.getSelectedRow(), 0),  model.getValueAt(table.getSelectedRow(), 1).toString());
                     update();
                 } else {
                     JOptionPane.showMessageDialog(null, "Выберите курс.", "Информация", JOptionPane.INFORMATION_MESSAGE);
@@ -109,8 +111,8 @@ public class WindowApp extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    private void updateCourse(String uuid, String version, String name) {
-        AppController.updateCourse(uuid, version, name);
+    private void updateCourse(String uuid, String version) {
+        AppController.updateCourse(uuid, version);
     }
 
     private void deleteCourse(String uuid, String version) {

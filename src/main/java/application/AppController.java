@@ -1,6 +1,7 @@
 package application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import courses.Course;
 import courses.CourseInfo;
 import databaseconnector.DBConnector;
 
@@ -79,7 +80,17 @@ public class AppController {
         return result;
     }
 
-    public static void updateCourse(String uuid, String version, String name) {
-
+    public static void updateCourse(String uuid, String version) {
+        JFrame frame = new JFrame();
+        int ver = Integer.parseInt(version);
+        Course course = DBConnector.getCourse(uuid, ver);
+        CourseUpdateWindow courseWindow = new CourseUpdateWindow(frame, course);
+        Course newCourse = courseWindow.getCourse();
+        courseWindow.dispose();
+        if (course.equals(newCourse)) {
+            return;
+        } else {
+            DBConnector.updateCourse(newCourse);
+        }
     }
 }

@@ -46,7 +46,13 @@ public class CourseChooserTableWindow extends JDialog{
                 new String [] {
                         "UUID", "Version", "Name"
                 }
-        ));
+
+        )   {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+        });
         showTable();
         final DefaultTableModel model = (DefaultTableModel) table.getModel();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -61,8 +67,7 @@ public class CourseChooserTableWindow extends JDialog{
 
         okButton = new JButton("Ок");
         okButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
                     uuidAndVersion.add(0, (String) model.getValueAt(table.getSelectedRow(), 0));
                     uuidAndVersion.add(1,  model.getValueAt(table.getSelectedRow(), 1).toString());
