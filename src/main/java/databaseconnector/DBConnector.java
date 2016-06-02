@@ -110,15 +110,15 @@ public class DBConnector {
     public static void insertCourse(CourseInfo courseInfo, String uuid, int version) {
         try {
             Connection connection = getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO `courses`(`UUID`, `VERSION`, `NAME`, `MISTAKES_ALLOWED`) VALUES(?,?,?,?);");
+            PreparedStatement statement = createPreparedStatement(connection, "INSERT INTO `courses`(`UUID`, `VERSION`, `NAME`, `MISTAKES_ALLOWED`) VALUES(?,?,?,?);");
             statement.setString(1, uuid);
             statement.setInt(2, version);
             statement.setString(3, courseInfo.getName());
             statement.setInt(4, courseInfo.getMistakesAllowed());
             statement.execute();
 
-            PreparedStatement questionStatement = connection.prepareStatement("INSERT INTO `questions`(`COURSE_ID`, `TICKET_NUMBER`, `QUESTION_NUMBER`, `QUESTION`) VALUES(?,?,?,?);");
-            PreparedStatement answerStatement = connection.prepareStatement("INSERT INTO `answers`(`COURSE_ID`, `QUESTION_NUMBER`, `TICKET_NUMBER`, `ANSWER`, `IS_CORRECT`) VALUES(?,?,?,?,?)");
+            PreparedStatement questionStatement = createPreparedStatement(connection, "INSERT INTO `questions`(`COURSE_ID`, `TICKET_NUMBER`, `QUESTION_NUMBER`, `QUESTION`) VALUES(?,?,?,?);");
+            PreparedStatement answerStatement = createPreparedStatement(connection, "INSERT INTO `answers`(`COURSE_ID`, `QUESTION_NUMBER`, `TICKET_NUMBER`, `ANSWER`, `IS_CORRECT`) VALUES(?,?,?,?,?)");
             long courseId = getId(uuid, version);
             for (Ticket ticket : courseInfo.getTickets()) {
                 int questionNumber = 1;
@@ -139,7 +139,9 @@ public class DBConnector {
                     questionNumber++;
                 }
             }
-            connection.close();
+            questionStatement.close();
+            answerStatement.close();
+            close(null, statement, connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -235,13 +237,13 @@ public class DBConnector {
                 question = new DownloadedQuestion(resultSet.getInt("COURSE_ID"), resultSet.getInt("TICKET_NUMBER"), resultSet.getInt("QUESTION_NUMBER"), resultSet.getString("QUESTION"));
                 answerStatement = createPreparedStatement(connection, answerQuery);
                 answerStatement.setLong(1, id);
-                answerStatement.setLong(2, question.getQuestionNumber());
-                answerStatement.setLong(3, question.getTicketNumber());
+                answerStatement.setLong(2, question.getId().getQuestionNumber());
+                answerStatement.setLong(3, question.getId().getTicketNumber());
                 answerResult = getResultSet(answerStatement);
                 ArrayList<DownloadedAnswer> answers = new ArrayList<DownloadedAnswer>();
                 DownloadedAnswer answer;
                 while (answerResult.next()) {
-                    answer = new DownloadedAnswer(answerResult.getInt("COURSE_ID"), answerResult.getInt("TICKET_NUMBER"), answerResult.getInt("QUESTION_NUMBER"), answerResult.getString("ANSWER"), answerResult.getInt("IS_CORRECT"));
+                    answer = new DownloadedAnswer(answerResult.getString("ANSWER"), answerResult.getInt("IS_CORRECT"));
                     answers.add(answer);
                 }
                 question.setAnswers(answers);

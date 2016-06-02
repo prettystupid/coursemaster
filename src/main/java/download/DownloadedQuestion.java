@@ -5,41 +5,21 @@ import java.util.List;
 
 public class DownloadedQuestion implements Serializable{
 
-    private long courseId;
-    private long ticketNumber;
-    private long questionNumber;
+    private QuestionIdentity id;
     private String question;
     private List<DownloadedAnswer> answers;
 
     public DownloadedQuestion(int courseId, int ticketNumber, int questionNumber, String question) {
-        this.courseId = courseId;
-        this.ticketNumber = ticketNumber;
-        this.questionNumber = questionNumber;
+        id = new QuestionIdentity(courseId, ticketNumber, questionNumber);
         this.question = question;
     }
 
-    public long getCourseId() {
-        return courseId;
+    public QuestionIdentity getId() {
+        return id;
     }
 
-    public void setCourseId(long courseId) {
-        this.courseId = courseId;
-    }
-
-    public long getTicketNumber() {
-        return ticketNumber;
-    }
-
-    public void setTicketNumber(long ticketNumber) {
-        this.ticketNumber = ticketNumber;
-    }
-
-    public long getQuestionNumber() {
-        return questionNumber;
-    }
-
-    public void setQuestionNumber(long questionNumber) {
-        this.questionNumber = questionNumber;
+    public void setId(QuestionIdentity id) {
+        this.id = id;
     }
 
     public String getQuestion() {

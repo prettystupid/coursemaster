@@ -74,7 +74,7 @@ public class CourseChooserTableWindow extends JDialog{
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 uuidAndVersion.add(0, UUID.randomUUID().toString());
-                uuidAndVersion.add(1, "1");
+                uuidAndVersion.add(1, "0");
                 close();
             }
         });
