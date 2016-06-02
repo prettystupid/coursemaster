@@ -1,6 +1,10 @@
 package databaseconnector;
 
 import courses.*;
+import download.DownloadedAnswer;
+import download.DownloadedCourse;
+import download.DownloadedQuestion;
+import organization.Organization;
 
 import javax.swing.*;
 import java.sql.*;
@@ -24,45 +28,79 @@ public class DBConnector {
         return connection;
     }
 
-    public static ArrayList<Course> getCourses() {
-        Connection connection = getConnection();
+    private static PreparedStatement createPreparedStatement(Connection connection, String query) {
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return preparedStatement;
+    }
 
+    private static ResultSet getResultSet(PreparedStatement preparedStatement) {
+        ResultSet resultSet = null;
+        try {
+            resultSet = preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultSet;
+    }
+
+    public static ArrayList<Course> getCourses() {
         ArrayList<Course> courses = new ArrayList<Course>();
+
+        Connection connection = getConnection();
         String query = "SELECT * FROM `courses`";
-        Statement statement;
-        ResultSet resultSet;
+        PreparedStatement statement = createPreparedStatement(connection, query);
+        ResultSet resultSet = getResultSet(statement);
 
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
             Course course;
             while (resultSet.next()) {
                 course = new Course(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
                 courses.add(course);
             }
-            connection.close();
+            close(resultSet, statement, connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return courses;
     }
 
-    public static Course getCourse(String uuid, int version) {
-        Connection connection = getConnection();
+    private static void close(ResultSet resultSet, PreparedStatement statement, Connection connection) {
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-        long id = getId(uuid, version);
+    }
+
+    public static Course getCourse(String uuid, int version) {
         Course course = null;
-        String query = "SELECT * FROM `courses` WHERE ID =" + id;
-        Statement statement;
-        ResultSet resultSet;
+        long id = getId(uuid, version);
+
+        Connection connection = getConnection();
+        String query = "SELECT * FROM `courses` WHERE ID = ?";
+        PreparedStatement statement = createPreparedStatement(connection, query);
 
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
+            statement.setLong(1, id);
+            ResultSet resultSet = getResultSet(statement);
             if (resultSet.next()) {
                 course = new Course(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
             }
-            connection.close();
+            close(resultSet, statement, connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -107,31 +145,19 @@ public class DBConnector {
         }
     }
 
-    public static int findMatches(String uuid, int version) {
-        String query = "SELECT ID FROM `courses` where UUID='" + uuid + "' AND VERSION=" + version;
+    public static long getId(String uuid, int version) {
+        Connection connection = getConnection();
+        String query = "SELECT ID FROM `courses` where UUID = ? AND VERSION = ?;";
+        PreparedStatement statement = createPreparedStatement(connection, query);
         try {
-            Connection connection = getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet result =  statement.executeQuery(query);
-            if (result.next())
-                return 1;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    private static long getId(String uuid, int version) {
-        String query = "SELECT ID FROM `courses` where UUID='" + uuid + "' AND VERSION=" + version + ";";
-        try {
-            Connection connection = getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet result =  statement.executeQuery(query);
+            statement.setString(1, uuid);
+            statement.setInt(2, version);
+            ResultSet result = getResultSet(statement);
             if (result.next()) {
                 int id = result.getInt("ID");
-                connection.close();
                 return id;
             }
+            close(result, statement, connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -157,21 +183,111 @@ public class DBConnector {
     }
 
     public static void updateCourse(Course course) {
-        if (findMatches(course.getUuid(), course.getVersion()) != 0) {
+        long id = getId(course.getUuid(), course.getVersion());
+        if ((id != -1) && (id != course.getId())) {
             JOptionPane.showMessageDialog(null, "Данная версия уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
         Connection connection = getConnection();
+        String query = "UPDATE `courses` SET UUID = ?, VERSION = ?, NAME = ? WHERE ID = ?";
+        PreparedStatement statement = createPreparedStatement(connection, query);
+
         try {
-            String query = "UPDATE `courses` SET UUID = ?, VERSION = ?, NAME = ? WHERE ID = " +course.getId();
-            PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, course.getUuid());
             statement.setInt(2, course.getVersion());
             statement.setString(3, course.getName());
+            statement.setLong(4, course.getId());
             statement.execute();
-            connection.close();
+            close(null, statement, connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static DownloadedCourse getDownloadedCourse(String uuid, int version) {
+        DownloadedCourse course = null;
+        long id = getId(uuid, version);
+
+        Connection connection = getConnection();
+        String courseQuery = "SELECT * FROM `courses` WHERE ID = ?";
+        String questionQuery = "SELECT * FROM `questions` WHERE COURSE_ID = ?";
+        String answerQuery = "SELECT * FROM `answers` WHERE COURSE_ID = ? AND QUESTION_NUMBER = ? AND TICKET_NUMBER = ?";
+        PreparedStatement statement = createPreparedStatement(connection, courseQuery);
+
+        try {
+            statement.setLong(1, id);
+            ResultSet resultSet = getResultSet(statement);
+            if (resultSet.next()) {
+                course = new DownloadedCourse(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
+            } else {
+                return course;
+            }
+
+            ArrayList<DownloadedQuestion> questions = new ArrayList<DownloadedQuestion>();
+            statement = createPreparedStatement(connection, questionQuery);
+            statement.setLong(1, id);
+            resultSet = getResultSet(statement);
+            DownloadedQuestion question;
+            PreparedStatement answerStatement = null;
+            ResultSet answerResult = null;
+            while (resultSet.next()) {
+                question = new DownloadedQuestion(resultSet.getInt("COURSE_ID"), resultSet.getInt("TICKET_NUMBER"), resultSet.getInt("QUESTION_NUMBER"), resultSet.getString("QUESTION"));
+                answerStatement = createPreparedStatement(connection, answerQuery);
+                answerStatement.setLong(1, id);
+                answerStatement.setLong(2, question.getQuestionNumber());
+                answerStatement.setLong(3, question.getTicketNumber());
+                answerResult = getResultSet(answerStatement);
+                ArrayList<DownloadedAnswer> answers = new ArrayList<DownloadedAnswer>();
+                DownloadedAnswer answer;
+                while (answerResult.next()) {
+                    answer = new DownloadedAnswer(answerResult.getInt("COURSE_ID"), answerResult.getInt("TICKET_NUMBER"), answerResult.getInt("QUESTION_NUMBER"), answerResult.getString("ANSWER"), answerResult.getInt("IS_CORRECT"));
+                    answers.add(answer);
+                }
+                question.setAnswers(answers);
+                questions.add(question);
+            }
+            course.setQuestions(questions);
+            close(answerResult, answerStatement, null);
+            close(resultSet, statement, connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return course;
+    }
+
+    public static void createOrganization(Organization org) {
+        Connection connection = getConnection();
+        String query = "INSERT INTO `organizations`(`NAME`, `SECRET_KEY`) VALUES(?,?);";
+        PreparedStatement statement = createPreparedStatement(connection, query);
+        try {
+            statement.setString(1, org.getName());
+            statement.setString(2, org.getKey());
+            statement.execute();
+            close(null, statement, connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Organization> getOrganizations() {
+        ArrayList<Organization> organizations = new ArrayList<Organization>();
+
+        Connection connection = getConnection();
+        String query = "SELECT * FROM `organizations`";
+        PreparedStatement statement = createPreparedStatement(connection, query);
+        ResultSet resultSet = getResultSet(statement);
+
+        try {
+            Organization organization;
+            while (resultSet.next()) {
+                organization = new Organization(resultSet.getString("NAME"), resultSet.getString("SECRET_KEY"));
+                organizations.add(organization);
+            }
+            close(resultSet, statement, connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return organizations;
     }
 }

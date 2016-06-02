@@ -1,34 +1,28 @@
 package application;
 
 import courses.Course;
-import databaseconnector.DBConnector;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.UUID;
 
-public class CourseUpdateWindow extends JDialog{
+class CourseUpdateWindow extends JDialog{
 
-    JPanel infoPanel;
-    JLabel uuidLabel;
-    JLabel versionLabel;
-    JLabel nameLabel;
-    JTextField uuidTField;
-    JTextField versionTField;
-    JTextField nameTField;
-    JPanel buttonPanel;
-    JButton okButton;
-    JButton cancelButton;
+    private JPanel infoPanel;
+    private JLabel uuidLabel;
+    private JLabel versionLabel;
+    private JLabel nameLabel;
+    private JTextField uuidTField;
+    private JTextField versionTField;
+    private JTextField nameTField;
+    private JPanel buttonPanel;
+    private JButton okButton;
+    private JButton cancelButton;
 
-    Course course;
+    private Course course;
 
-    public CourseUpdateWindow(JFrame owner, Course course) {
+    CourseUpdateWindow(JFrame owner, Course course) {
         super(owner, "Курс", true);
         this.course = new Course(course);
         initComponents();
@@ -85,6 +79,7 @@ public class CourseUpdateWindow extends JDialog{
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 course.setUuid(uuidTField.getText());
+                course.setName(nameTField.getText());
                 try {
                     course.setVersion(Integer.parseInt(versionTField.getText()));
                 } catch (NumberFormatException ex) {
@@ -116,7 +111,7 @@ public class CourseUpdateWindow extends JDialog{
         setVisible(false);
     }
 
-    public Course getCourse() {
+    Course getCourse() {
         return course;
     }
 }

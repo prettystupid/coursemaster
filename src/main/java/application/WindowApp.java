@@ -18,6 +18,7 @@ public class WindowApp extends JFrame {
     JButton downloadCourseButton;
     JButton deleteCourseButton;
     JButton updateCourseButton;
+    JButton addOrganizationButton;
 
     public WindowApp() {
         super("CourseMaster");
@@ -61,17 +62,19 @@ public class WindowApp extends JFrame {
             }
         });
         uploadCourseButton.setSize(150,50);
-        uploadCourseButton.setLocation(25, 1090);
         buttonPanel.add(uploadCourseButton);
 
         downloadCourseButton = new JButton("Выгрузить курс");
         downloadCourseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                downloadCourse();
+                if (table.getSelectedRow() != -1) {
+                    downloadCourse((String) model.getValueAt(table.getSelectedRow(), 0),  model.getValueAt(table.getSelectedRow(), 1).toString());
+                } else {
+                    JOptionPane.showMessageDialog(null, "Выберите курс.", "Информация", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
         downloadCourseButton.setSize(150,50);
-        downloadCourseButton.setLocation(25, 1090);
         buttonPanel.add(downloadCourseButton);
 
         updateCourseButton = new JButton("Изменить курс");
@@ -86,7 +89,6 @@ public class WindowApp extends JFrame {
             }
         });
         updateCourseButton.setSize(150,50);
-        updateCourseButton.setLocation(25, 1090);
         buttonPanel.add(updateCourseButton);
 
         deleteCourseButton = new JButton("Удалить курс");
@@ -101,14 +103,26 @@ public class WindowApp extends JFrame {
             }
         });
         deleteCourseButton.setSize(150,50);
-        deleteCourseButton.setLocation(25, 1090);
         buttonPanel.add(deleteCourseButton);
+
+        addOrganizationButton = new JButton("Добавить организацию");
+        addOrganizationButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                addOrganization();
+            }
+        });
+        addOrganizationButton.setSize(150,50);
+        buttonPanel.add(addOrganizationButton);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setPreferredSize(new Dimension(1500, 350));
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private void addOrganization() {
+        AppController.addOrganization();
     }
 
     private void updateCourse(String uuid, String version) {
@@ -119,8 +133,8 @@ public class WindowApp extends JFrame {
         AppController.deleteCourse(uuid, version);
     }
 
-    private void downloadCourse() {
-        AppController.downloadCourse();
+    private void downloadCourse(String uuid, String version) {
+        AppController.downloadCourse(uuid, version);
     }
 
     private void uploadCourse() {
