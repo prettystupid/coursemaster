@@ -10,14 +10,10 @@ import encrypt.Encrypter;
 import org.apache.commons.io.FileUtils;
 import organization.Organization;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.UUID;
@@ -105,7 +101,7 @@ class AppController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        byte[] courseBytes = Serializer.objToBytes(jsonString);
+        byte[] courseBytes = objToBytes(jsonString);
         Encrypter encrypter = new Encrypter();
         byte[] decodedKey = Base64.getDecoder().decode(stringKey);
         SecretKey key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "DESede");
@@ -148,7 +144,7 @@ class AppController {
         }
     }
 
-    public static void addOrganization() {
+    static void addOrganization() {
         JFrame frame = new JFrame();
         AddOrganizationWindow window = new AddOrganizationWindow(frame);
         Organization org = window.getOrganization();
@@ -157,5 +153,23 @@ class AppController {
             return;
         }
         DBConnector.createOrganization(org);
+    }
+
+    private static byte[] objToBytes(Object object) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out;
+        try {
+            out = new ObjectOutputStream(bos);
+            out.writeObject(object);
+            byte[] result = bos.toByteArray();
+            if (out != null) {
+                out.close();
+            }
+            bos.close();
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
