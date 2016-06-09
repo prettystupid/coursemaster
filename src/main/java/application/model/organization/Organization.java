@@ -1,4 +1,4 @@
-package organization;
+package application.model.organization;
 
 public class Organization {
 

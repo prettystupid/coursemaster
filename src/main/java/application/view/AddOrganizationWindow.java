@@ -1,6 +1,6 @@
-package application;
+package application.view;
 
-import organization.Organization;
+import application.model.organization.Organization;
 
 import javax.crypto.KeyGenerator;
 import javax.swing.*;
@@ -11,7 +11,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-class AddOrganizationWindow extends JDialog{
+public class AddOrganizationWindow extends JDialog{
 
     private JPanel infoPanel;
     private JLabel nameLabel;

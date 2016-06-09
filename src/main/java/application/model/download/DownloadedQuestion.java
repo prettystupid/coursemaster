@@ -1,4 +1,4 @@
-package download;
+package application.model.download;
 
 import java.io.Serializable;
 import java.util.List;

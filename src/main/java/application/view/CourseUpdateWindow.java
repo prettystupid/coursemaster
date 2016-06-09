@@ -1,13 +1,13 @@
-package application;
+package application.view;
 
-import courses.Course;
+import application.model.courses.Course;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class CourseUpdateWindow extends JDialog{
+public class CourseUpdateWindow extends JDialog{
 
     private JPanel infoPanel;
     private JLabel uuidLabel;

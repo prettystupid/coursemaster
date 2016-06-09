@@ -1,4 +1,4 @@
-package courses;
+package application.model.courses;
 
 public class Answer {
 

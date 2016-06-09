@@ -1,14 +1,14 @@
-package application;
+package application.controller;
 
+import application.view.chooser.CourseChooserTableWindow;
+import application.view.chooser.OrgChooserTableWindow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import courses.Course;
-import courses.CourseInfo;
-import databaseconnector.DBConnector;
-import download.DownloadedCourse;
-import encrypt.Encrypter;
+import application.model.courses.CourseInfo;
+import application.utils.DBConnector;
+import application.model.download.DownloadedCourse;
+import application.utils.Encrypter;
 import org.apache.commons.io.FileUtils;
-import organization.Organization;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,9 +18,15 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.UUID;
 
-class AppController {
+public class Cntrllr {
 
-    static void uploadCourse() {
+    /*WindowApp app;
+
+    public Cntrllr(WindowApp app) {
+        this.app = app;
+    }*/
+
+    public void uploadCourse() {
         String uuid = "";
         int version = 1;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Создать новую версию к существующему курсу?", "Информация", JOptionPane.YES_NO_OPTION);
@@ -49,7 +55,7 @@ class AppController {
         DBConnector.insertCourse(courseInfo, uuid, version);
     }
 
-    private static CourseInfo getInfoFromJSON() {
+    private CourseInfo getInfoFromJSON() {
         CourseInfo courseInfo;
         JFileChooser fileopen = new JFileChooser("C:\\");
         int ret = fileopen.showDialog(null, "Открыть файл");
@@ -72,12 +78,12 @@ class AppController {
         }
     }
 
-    static void deleteCourse(String uuid, String version) {
+    public void deleteCourse(String uuid, String version) {
         int ver = Integer.parseInt(version);
         DBConnector.delete(uuid, ver);
     }
 
-    static void downloadCourse(String uuid, String version) {
+    public void downloadCourse(String uuid, String version) {
         String stringKey = getKeyByOrg();
         int ver = Integer.parseInt(version);
         DownloadedCourse course = DBConnector.getDownloadedCourse(uuid, ver);
@@ -102,10 +108,9 @@ class AppController {
             e.printStackTrace();
         }
         byte[] courseBytes = objToBytes(jsonString);
-        Encrypter encrypter = new Encrypter();
         byte[] decodedKey = Base64.getDecoder().decode(stringKey);
         SecretKey key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "DESede");
-        encrypter.setKey(key);
+        Encrypter encrypter = new Encrypter(key);
         byte[] result = encrypter.encrypt(courseBytes);
         try {
             FileUtils.writeByteArrayToFile(new File(directory + "\\course" + course.getId()+ "\\course.course"), result);
@@ -115,7 +120,7 @@ class AppController {
         }
     }
 
-    private static String getKeyByOrg() {
+    private String getKeyByOrg() {
         JFrame frame = new JFrame();
         OrgChooserTableWindow tableWindow = new OrgChooserTableWindow(frame);
         String key = tableWindow.getKey();
@@ -123,7 +128,7 @@ class AppController {
         return key;
     }
 
-    private static ArrayList<String> selectPreviousCourse() {
+    private ArrayList<String> selectPreviousCourse() {
         ArrayList<String> result;
         JFrame frame = new JFrame();
         CourseChooserTableWindow tableWindow = new CourseChooserTableWindow(frame);
@@ -132,7 +137,7 @@ class AppController {
         return result;
     }
 
-    static void updateCourse(String uuid, String version) {
+    /*public void updateCourse(String uuid, String version) {
         JFrame frame = new JFrame();
         int ver = Integer.parseInt(version);
         Course course = DBConnector.getCourse(uuid, ver);
@@ -144,7 +149,7 @@ class AppController {
         }
     }
 
-    static void addOrganization() {
+    public void addOrganization() {
         JFrame frame = new JFrame();
         AddOrganizationWindow window = new AddOrganizationWindow(frame);
         Organization org = window.getOrganization();
@@ -153,9 +158,9 @@ class AppController {
             return;
         }
         DBConnector.createOrganization(org);
-    }
+    }*/
 
-    private static byte[] objToBytes(Object object) {
+    private byte[] objToBytes(Object object) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out;
         try {

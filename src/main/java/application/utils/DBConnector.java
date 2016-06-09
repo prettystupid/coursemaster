@@ -1,10 +1,10 @@
-package databaseconnector;
+package application.utils;
 
-import courses.*;
-import download.DownloadedAnswer;
-import download.DownloadedCourse;
-import download.DownloadedQuestion;
-import organization.Organization;
+import application.model.courses.*;
+import application.model.download.DownloadedAnswer;
+import application.model.download.DownloadedCourse;
+import application.model.download.DownloadedQuestion;
+import application.model.organization.Organization;
 
 import javax.swing.*;
 import java.sql.*;

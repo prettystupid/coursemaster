@@ -1,0 +1,5 @@
+<config>
+    <user-name>javauser</user-name>
+    <password>javauser</password>
+    <db-name>coursemaster</db-name>
+</config>

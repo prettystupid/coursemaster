@@ -1,7 +1,7 @@
-package application;
+package application.view.chooser;
 
-import databaseconnector.DBConnector;
-import organization.Organization;
+import application.utils.DBConnector;
+import application.model.organization.Organization;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

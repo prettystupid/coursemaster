@@ -1,23 +1,28 @@
-package download;
+package application.model.courses;
 
-import java.io.Serializable;
-import java.util.List;
-
-public class DownloadedCourse implements Serializable{
+public class Course {
 
     private long id;
     private String uuid;
     private int version;
     private String name;
     private int mistakesAllowed;
-    private List<DownloadedQuestion> questions;
 
-    public DownloadedCourse (long id, String uuid, int version, String name, int mistakesAllowed) {
+    public Course (long id, String uuid, int version, String name, int mistakesAllowed) {
         this.id = id;
         this.uuid = uuid;
         this.version = version;
         this.name = name;
         this.mistakesAllowed = mistakesAllowed;
+    }
+
+    public Course (Course course) {
+        id = course.getId();
+        uuid = course.getUuid();
+        version = course.getVersion();
+        name = course.getName();
+        mistakesAllowed = course.getMistakesAllowed();
+
     }
 
     public long getId() {
@@ -60,11 +65,7 @@ public class DownloadedCourse implements Serializable{
         this.mistakesAllowed = mistakesAllowed;
     }
 
-    public List<DownloadedQuestion> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(List<DownloadedQuestion> questions) {
-        this.questions = questions;
+    public boolean equals(Course course){
+        return (id == course.getId())&&(uuid.equals(course.getUuid()))&&(version == course.getVersion())&&(name.equals(course.getName()))&&(mistakesAllowed == course.getMistakesAllowed());
     }
 }

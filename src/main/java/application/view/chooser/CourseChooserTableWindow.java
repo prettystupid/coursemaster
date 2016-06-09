@@ -1,7 +1,7 @@
-package application;
+package application.view.chooser;
 
-import courses.Course;
-import databaseconnector.DBConnector;
+import application.model.courses.Course;
+import application.utils.DBConnector;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

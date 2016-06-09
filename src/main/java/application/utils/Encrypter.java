@@ -1,4 +1,4 @@
-package encrypt;
+package application.utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -10,9 +10,9 @@ public class Encrypter {
     private Key key = null;
     private static Cipher cipher = null;
 
-    public Encrypter() {
+    public Encrypter(Key key) {
         try {
-            key = KeyGenerator.getInstance(algorithm).generateKey();
+            this.key = key;
             cipher = Cipher.getInstance(algorithm);
         } catch (Exception e) {
             e.printStackTrace();
@@ -28,13 +28,5 @@ public class Encrypter {
             e.printStackTrace();
         }
         return result;
-    }
-
-    public Key getKey() {
-        return key;
-    }
-
-    public void setKey(Key key) {
-        this.key = key;
     }
 }
