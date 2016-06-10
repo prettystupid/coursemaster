@@ -1,6 +1,7 @@
 package application.view;
 
-import application.model.organization.Organization;
+import application.controller.entitycontroller.OrganizationController;
+import application.model.entity.organization.Organization;
 
 import javax.crypto.KeyGenerator;
 import javax.swing.*;
@@ -11,7 +12,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class AddOrganizationWindow extends JDialog{
+public class OrganizationWindow extends JFrame{
 
     private JPanel infoPanel;
     private JLabel nameLabel;
@@ -20,10 +21,12 @@ public class AddOrganizationWindow extends JDialog{
     private JButton okButton;
     private JButton cancelButton;
 
+    private OrganizationController controller;
+
     private Organization org;
 
-    AddOrganizationWindow(JFrame owner) {
-        super(owner, "Организация", true);
+    public OrganizationWindow() {
+        super("Организации");
         initComponents();
     }
 

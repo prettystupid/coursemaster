@@ -1,8 +1,9 @@
 package application.view.main;
 
-import application.controller.MainWindowController;
+import application.controller.MainController;
 import application.utils.PanelFactory;
-import application.view.EntityType;
+import application.model.entity.DocumentType;
+import org.apache.commons.configuration.ConfigurationException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,9 +13,9 @@ import java.awt.event.ActionListener;
 public class MainWindow extends JFrame{
 
     JTabbedPane tabbedPane;
-    MainWindowController controller;
+    MainController controller;
 
-    public MainWindow(MainWindowController controller) {
+    public MainWindow(MainController controller) {
         super("Master");
         this.controller = controller;
         initComponents();
@@ -25,33 +26,42 @@ public class MainWindow extends JFrame{
         tabbedPane = new JTabbedPane();
         getContentPane().add(tabbedPane);
 
-        JPanel coursePanel = PanelFactory.createPanel(EntityType.COURSE);
+        JPanel coursePanel = PanelFactory.createPanel(DocumentType.COURSE, controller);
         tabbedPane.addTab("Курсы", coursePanel);
 
-        JPanel ntdPanel = PanelFactory.createPanel(EntityType.NTD);
+        JPanel ntdPanel = PanelFactory.createPanel(DocumentType.NTD, controller);
         tabbedPane.addTab("Нормативно-технические документы", ntdPanel);
 
         JMenuBar menuBar = new JMenuBar();
         JMenu mainMenu = new JMenu("Меню");
         menuBar.add(mainMenu);
 
-        JMenuItem addOrgItem = new JMenuItem("Добавить организацию");
+        JMenuItem addOrgItem = new JMenuItem("Организации");
         addOrgItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.addOrganization();
+                // TODO: 09.06.2016
             }
         });
         mainMenu.add(addOrgItem);
 
-        JMenuItem dbSettingsItem = new JMenuItem("Настройки базы данных");
-        addOrgItem.addActionListener(new ActionListener() {
+        JMenuItem dbSettingsItem = new JMenuItem("Настройка базы данных");
+        dbSettingsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 controller.setDB();
             }
         });
         mainMenu.add(dbSettingsItem);
+
+        JMenuItem createDBItem = new JMenuItem("Создать базу данных");
+        createDBItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.createDB();
+            }
+        });
+        mainMenu.add(createDBItem);
 
         setJMenuBar(menuBar);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

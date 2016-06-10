@@ -1,5 +1,9 @@
 package application.utils;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
+
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,22 +11,31 @@ import java.sql.Statement;
 
 public class DBCreator {
 
-    final static String username = "javauser";
-    final static String password = "javauser";
+    public static void create() throws ConfigurationException {
 
-    public static void main(String[] args) {
+        XMLConfiguration config = new XMLConfiguration("src\\main\\resources\\config.xml");
+        final String username = config.getString("username");
+        final String password = config.getString("password");
+        final String dbName = config.getString("db-name");
+        final String url = new StringBuilder("jdbc:mysql://localhost:3306/").append(dbName).append("?useSSL=false&serverTimezone=UTC").toString();
+
         try {
-            String url = "jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC";
-            Connection connection = DriverManager.getConnection(url, username, password);
-            String query = "CREATE SCHEMA " + "coursemaster";
+            String urlToSchema = "jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=UTC";
+            Connection connection = DriverManager.getConnection(urlToSchema, username, password);
+            String query = "CREATE SCHEMA " + dbName;
             Statement statement = connection.createStatement();
-            statement.executeUpdate(query);
+            try {
+                statement.executeUpdate(query);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "База данных с таким именем уже существует", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             statement.close();
             connection.close();
 
-            url = "jdbc:mysql://localhost:3306/coursemaster?useSSL=false&serverTimezone=UTC";
             connection = DriverManager.getConnection(url, username, password);
-            query = "CREATE TABLE coursemaster.courses\n" +
+            query = "CREATE TABLE " + dbName + ".courses\n" +
                     "(\n" +
                     "    ID INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,\n" +
                     "    UUID VARCHAR(50) DEFAULT \"\",\n" +
@@ -33,7 +46,17 @@ public class DBCreator {
             statement = connection.createStatement();
             statement.executeUpdate(query);
 
-            query = "CREATE TABLE coursemaster.answers\n" +
+            query = "CREATE TABLE " + dbName + ".questions\n" +
+                    "(\n" +
+                    "    COURSE_ID INT(11),\n" +
+                    "    QUESTION_NUMBER INT(11),\n" +
+                    "    TICKET_NUMBER INT(11),\n" +
+                    "    QUESTION VARCHAR(1024),\n" +
+                    "    PRIMARY KEY (COURSE_ID, TICKET_NUMBER, QUESTION_NUMBER)\n" +
+                    ");";
+            statement.executeUpdate(query);
+
+            query = "CREATE TABLE " + dbName + ".answers\n" +
                     "(\n" +
                     "    ID INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,\n" +
                     "    COURSE_ID INT(11),\n" +
@@ -44,17 +67,7 @@ public class DBCreator {
                     ");";
             statement.executeUpdate(query);
 
-            query = "CREATE TABLE coursemaster.questions\n" +
-                    "(\n" +
-                    "    COURSE_ID INT(11),\n" +
-                    "    QUESTION_NUMBER INT(11),\n" +
-                    "    TICKET_NUMBER INT(11),\n" +
-                    "    QUESTION VARCHAR(1024),\n" +
-                    "  PRIMARY KEY (COURSE_ID, TICKET_NUMBER, QUESTION_NUMBER)\n" +
-                    ");";
-            statement.executeUpdate(query);
-
-            query = "CREATE TABLE coursemaster.organizations\n" +
+            query = "CREATE TABLE " + dbName + ".organizations\n" +
                     "(\n" +
                     "    ID INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,\n" +
                     "    NAME VARCHAR (255),\n" +

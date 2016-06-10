@@ -1,45 +1,41 @@
-package application.controller;
+package application.controller.entitycontroller;
 
-import application.view.chooser.CourseChooserTableWindow;
-import application.view.chooser.OrgChooserTableWindow;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import application.controller.MainController;
+import application.model.entity.Document;
+import application.model.entity.course.Course;
+import application.model.entity.course.CourseInfo;
+import application.utils.dao.CourseDAO;
+import application.utils.dao.DocumentDAO;
+import application.view.EntityChooserWindow;
+import application.view.DocumentChangeWindow;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import application.model.courses.CourseInfo;
-import application.utils.DBConnector;
-import application.model.download.DownloadedCourse;
-import application.utils.Encrypter;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.configuration.ConfigurationException;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.UUID;
 
-public class Cntrllr {
+public class CourseController extends EntityController {
 
-    /*WindowApp app;
+    public CourseController(MainController mainController) {
+        super(mainController);
+        dao = new CourseDAO();
+    }
 
-    public Cntrllr(WindowApp app) {
-        this.app = app;
-    }*/
-
-    public void uploadCourse() {
+    @Override
+    public void upload() throws SQLException, ConfigurationException {
         String uuid = "";
-        int version = 1;
+        long version = 1;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Создать новую версию к существующему курсу?", "Информация", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {
-            ArrayList<String> uuidAndVersion = selectPreviousCourse();
-            try {
-                uuid = uuidAndVersion.get(0);
-                version = Integer.parseInt(uuidAndVersion.get(1)) + 1;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Course course = selectPreviousCourse();
+            uuid = course.getUuid();
+            version = course.getVersion() + 1;
             if (version != 1) {
-                if (DBConnector.getId(uuid, version) != -1) {
+                if (((DocumentDAO) dao).findMatches(uuid, version) != -1) {
                     JOptionPane.showMessageDialog(null, "Данная версия уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -52,7 +48,75 @@ public class Cntrllr {
         if (courseInfo == null) {
             return;
         }
-        DBConnector.insertCourse(courseInfo, uuid, version);
+        Course course = new Course(courseInfo, uuid, version);
+        dao.insert(course);
+        update();
+    }
+
+    @Override
+    public void download() {
+
+    }
+
+    @Override
+    public void change(Long id) throws SQLException, ConfigurationException {
+        JFrame frame = new JFrame();
+        Course course = (Course) dao.getById(id);
+        DocumentChangeWindow courseWindow = new DocumentChangeWindow(frame, course);
+        Course newCourse = new Course(course);
+        Document document = courseWindow.getDocument();
+        newCourse.setUuid(document.getUuid());
+        newCourse.setVersion(document.getVersion());
+        newCourse.setName(document.getName());
+        courseWindow.dispose();
+        if (!course.equals(newCourse)) {
+            dao.change(newCourse);
+            update();
+        }
+    }
+
+    @Override
+    public void delete(Long id) throws SQLException, ConfigurationException {
+        dao.delete(id);
+        update();
+    }
+
+    @Override
+    public void update() throws SQLException, ConfigurationException {
+        DefaultTableModel model = (DefaultTableModel)table.getModel();
+        model.setRowCount(0);
+        ArrayList<Course> courses;
+        courses = dao.getAll();
+        Object[] row = new Object[4];
+        for (Course course: courses) {
+            row[0] = course.getId();
+            row[1] = course.getUuid();
+            row[2] = course.getVersion();
+            row[3] = course.getName();
+            model.addRow(row);
+        }
+    }
+
+    @Override
+    public void createTable() throws SQLException, ConfigurationException {
+        table.setModel(new DefaultTableModel(
+                new Object [][] {},
+                new String [] {
+                        "ID", "UUID", "Версия", "Имя"
+                }
+        )   {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        });
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(250);
+        table.getColumnModel().getColumn(2).setPreferredWidth(75);
+        table.getColumnModel().getColumn(3).setPreferredWidth(1500);
+        update();
     }
 
     private CourseInfo getInfoFromJSON() {
@@ -78,10 +142,21 @@ public class Cntrllr {
         }
     }
 
-    public void deleteCourse(String uuid, String version) {
-        int ver = Integer.parseInt(version);
-        DBConnector.delete(uuid, ver);
+    private Course selectPreviousCourse() {
+        Course course;
+        JFrame frame = new JFrame();
+        EntityChooserWindow tableWindow = new EntityChooserWindow(frame, new CourseController(mainController));
+        course = (Course) tableWindow.getEntity();
+        tableWindow.dispose();
+        if (course == null) {
+            course = new Course();
+            course.setUuid(UUID.randomUUID().toString());
+            course.setVersion(0);
+        }
+        return course;
     }
+
+   /*
 
     public void downloadCourse(String uuid, String version) {
         String stringKey = getKeyByOrg();
@@ -126,39 +201,9 @@ public class Cntrllr {
         String key = tableWindow.getKey();
         tableWindow.dispose();
         return key;
-    }
-
-    private ArrayList<String> selectPreviousCourse() {
-        ArrayList<String> result;
-        JFrame frame = new JFrame();
-        CourseChooserTableWindow tableWindow = new CourseChooserTableWindow(frame);
-        result = tableWindow.getUuidAndVersion();
-        tableWindow.dispose();
-        return result;
-    }
-
-    /*public void updateCourse(String uuid, String version) {
-        JFrame frame = new JFrame();
-        int ver = Integer.parseInt(version);
-        Course course = DBConnector.getCourse(uuid, ver);
-        CourseUpdateWindow courseWindow = new CourseUpdateWindow(frame, course);
-        Course newCourse = courseWindow.getCourse();
-        courseWindow.dispose();
-        if (!course.equals(newCourse)) {
-            DBConnector.updateCourse(newCourse);
-        }
-    }
-
-    public void addOrganization() {
-        JFrame frame = new JFrame();
-        AddOrganizationWindow window = new AddOrganizationWindow(frame);
-        Organization org = window.getOrganization();
-        window.dispose();
-        if (org == null) {
-            return;
-        }
-        DBConnector.createOrganization(org);
     }*/
+
+
 
     private byte[] objToBytes(Object object) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

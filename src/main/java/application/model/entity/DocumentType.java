@@ -1,11 +1,11 @@
-package application.view;
+package application.model.entity;
 
-public enum EntityType {
+public enum DocumentType {
 
     COURSE("Курс"),
     NTD("Нормативно-технический документ");
 
-    EntityType(String description) {
+    DocumentType(String description) {
         this.description = description;
     }
 

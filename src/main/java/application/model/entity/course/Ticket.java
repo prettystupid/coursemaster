@@ -1,4 +1,4 @@
-package application.model.courses;
+package application.model.entity.course;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,19 +1,21 @@
 package application.view.main;
 
-import application.controller.Controller;
+import application.controller.entitycontroller.EntityController;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
-public class ShowPanel extends JPanel{
+public class DocumentPanel extends JPanel{
 
-    private Controller controller;
+    private EntityController controller;
 
     private JTable table;
 
-    public ShowPanel(Controller controller) {
+    public DocumentPanel(EntityController controller) {
         super();
         setLayout(new BorderLayout());
         this.controller = controller;
@@ -23,6 +25,16 @@ public class ShowPanel extends JPanel{
     private void initComponents() {
 
         table = new JTable();
+        controller.setTable(table);
+        try {
+            controller.createTable();
+        } catch (SQLException e) {
+            controller.createSQLExceptionDialog();
+        } catch (Exception e) {
+            controller.createConfigurationExceptionDialog();
+        }
+        final DefaultTableModel model = (DefaultTableModel) table.getModel();
+
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane);
@@ -34,7 +46,13 @@ public class ShowPanel extends JPanel{
         JButton uploadButton = new JButton("Загрузить");
         uploadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controller.upload();
+                try {
+                    controller.upload();
+                } catch (SQLException e1) {
+                    controller.createSQLExceptionDialog();
+                } catch (Exception e1) {
+                    controller.createConfigurationExceptionDialog();
+                }
             }
         });
         uploadButton.setSize(150,50);
@@ -53,11 +71,17 @@ public class ShowPanel extends JPanel{
         downloadButton.setSize(150,50);
         buttonPanel.add(downloadButton);
 
-        JButton changeButton = new JButton("Изменить");
+        final JButton changeButton = new JButton("Изменить");
         changeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
-                    controller.change();
+                    try {
+                        controller.change((Long) model.getValueAt(table.getSelectedRow(), 0));
+                    } catch (SQLException e1) {
+                        controller.createSQLExceptionDialog();
+                    } catch (Exception e1) {
+                        controller.createConfigurationExceptionDialog();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Выберите элемент", "Информация", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -70,7 +94,13 @@ public class ShowPanel extends JPanel{
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
-                    controller.delete();
+                    try {
+                        controller.delete((Long) model.getValueAt(table.getSelectedRow(), 0));
+                    } catch (SQLException e1) {
+                        controller.createSQLExceptionDialog();
+                    } catch (Exception e1) {
+                        controller.createConfigurationExceptionDialog();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Выберите элемент", "Информация", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -82,7 +112,13 @@ public class ShowPanel extends JPanel{
         JButton updateButton = new JButton("Обновить");
         updateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controller.update();
+                try {
+                    controller.update();
+                } catch (SQLException e1) {
+                    controller.createSQLExceptionDialog();
+                } catch (Exception e1) {
+                    controller.createConfigurationExceptionDialog();
+                }
             }
         });
         deleteButton.setSize(150,50);

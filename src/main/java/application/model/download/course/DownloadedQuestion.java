@@ -1,4 +1,4 @@
-package application.model.download;
+package application.model.download.course;
 
 import java.io.Serializable;
 import java.util.List;

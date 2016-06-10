@@ -1,35 +1,32 @@
 package application.utils;
 
-import application.controller.Controller;
-import application.controller.CourseController;
-import application.controller.NTDController;
-import application.view.EntityType;
-import application.view.main.ShowPanel;
-
-import javax.swing.*;
+import application.controller.entitycontroller.EntityController;
+import application.controller.entitycontroller.CourseController;
+import application.controller.MainController;
+import application.controller.entitycontroller.NTDController;
+import application.model.entity.DocumentType;
+import application.view.main.DocumentPanel;
 
 public class PanelFactory {
 
-    public static ShowPanel createPanel(EntityType entityType) {
+    public static DocumentPanel createPanel(DocumentType entityType, MainController mainController) {
 
-        ShowPanel panel;
-        Controller controller;
+        DocumentPanel panel;
+        EntityController controller;
 
         switch (entityType) {
             case COURSE:
-                controller = new CourseController();
-                panel = new ShowPanel(controller);
-                controller.setView(panel);
+                controller = new CourseController(mainController);
                 break;
             case NTD:
-                controller = new NTDController();
-                panel = new ShowPanel(controller);
-                controller.setView(panel);
+                controller = new NTDController(mainController);
                 break;
             default:
-                throw new RuntimeException("EntityType " + entityType.toString() +
+                throw new RuntimeException("DocumentType " + entityType.toString() +
                     " not supported by current version");
         }
+        panel = new DocumentPanel(controller);
+        controller.setTable(panel.getTable());
         return panel;
     }
 }

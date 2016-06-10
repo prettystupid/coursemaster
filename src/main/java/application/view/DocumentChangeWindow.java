@@ -1,13 +1,14 @@
 package application.view;
 
-import application.model.courses.Course;
+import application.model.entity.Document;
+import application.model.entity.course.Course;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CourseUpdateWindow extends JDialog{
+public class DocumentChangeWindow extends JDialog{
 
     private JPanel infoPanel;
     private JLabel uuidLabel;
@@ -20,11 +21,11 @@ public class CourseUpdateWindow extends JDialog{
     private JButton okButton;
     private JButton cancelButton;
 
-    private Course course;
+    private Document document;
 
-    CourseUpdateWindow(JFrame owner, Course course) {
-        super(owner, "Курс", true);
-        this.course = new Course(course);
+    public DocumentChangeWindow(JFrame owner, Document document) {
+        super(owner, "Изменить", true);
+        this.document = new Document(document);
         initComponents();
     }
 
@@ -41,7 +42,7 @@ public class CourseUpdateWindow extends JDialog{
         c.gridy = 0;
         infoPanel.add(uuidLabel, c);
 
-        uuidTField = new JTextField(course.getUuid());
+        uuidTField = new JTextField(document.getUuid());
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 0;
@@ -53,7 +54,7 @@ public class CourseUpdateWindow extends JDialog{
         c.gridy = 1;
         infoPanel.add(versionLabel, c);
 
-        versionTField = new JTextField("" + course.getVersion());
+        versionTField = new JTextField("" + document.getVersion());
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 1;
@@ -65,7 +66,7 @@ public class CourseUpdateWindow extends JDialog{
         c.gridy = 2;
         infoPanel.add(nameLabel,c);
 
-        nameTField = new JTextField(course.getName());
+        nameTField = new JTextField(document.getName());
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 1;
         c.gridy = 2;
@@ -78,12 +79,12 @@ public class CourseUpdateWindow extends JDialog{
         okButton = new JButton("Ок");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                course.setUuid(uuidTField.getText());
-                course.setName(nameTField.getText());
+                document.setUuid(uuidTField.getText());
+                document.setName(nameTField.getText());
                 try {
-                    course.setVersion(Integer.parseInt(versionTField.getText()));
+                    document.setVersion(Integer.parseInt(versionTField.getText()));
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showConfirmDialog(null, "Версия должны быть натуральным числом", "Ошибка", JOptionPane.CLOSED_OPTION);
+                    JOptionPane.showConfirmDialog(null, "Версия должна быть натуральным числом", "Ошибка", JOptionPane.CLOSED_OPTION);
                     return;
                 }
                 close();
@@ -111,7 +112,7 @@ public class CourseUpdateWindow extends JDialog{
         setVisible(false);
     }
 
-    Course getCourse() {
-        return course;
+    public Document getDocument() {
+        return document;
     }
 }

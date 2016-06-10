@@ -1,4 +1,4 @@
-import application.controller.MainWindowController;
+import application.controller.MainController;
 import application.view.main.MainWindow;
 
 import javax.swing.*;
@@ -20,8 +20,9 @@ public class CourseMaster {
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                MainWindowController controller = new MainWindowController();
+                MainController controller = new MainController();
                 MainWindow app = new MainWindow(controller);
+                controller.setView(app);
                 app.setVisible(true);
             }
         });

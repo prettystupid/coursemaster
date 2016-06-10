@@ -1,5 +1,6 @@
-<config>
-    <user-name>javauser</user-name>
-    <password>javauser</password>
-    <db-name>coursemaster</db-name>
-</config>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+<username>javauser</username>
+<password>javauser</password>
+<db-name>documentmaster</db-name>
+</configuration>
