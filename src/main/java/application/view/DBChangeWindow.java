@@ -10,18 +10,11 @@ import java.awt.event.ActionListener;
 
 public class DBChangeWindow extends JDialog {
 
-    private JPanel infoPanel;
-    private JLabel usernameLabel;
-    private JLabel passwordLabel;
-    private JLabel dbNameLabel;
     private JTextField usernameTField;
     private JTextField passwordTField;
     private JTextField dbNameTField;
-    private JPanel buttonPanel;
-    private JButton okButton;
-    private JButton cancelButton;
 
-    XMLConfiguration config;
+    private XMLConfiguration config;
 
     public DBChangeWindow(JFrame owner) throws ConfigurationException {
         super(owner, "Настройки", true);
@@ -30,13 +23,13 @@ public class DBChangeWindow extends JDialog {
     }
 
     private void initComponents() {
-        infoPanel = new JPanel();
+        JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridBagLayout());
         getContentPane().add(infoPanel, BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
 
-        usernameLabel = new JLabel("Имя пользователя: ");
+        JLabel usernameLabel = new JLabel("Имя пользователя: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
@@ -48,7 +41,7 @@ public class DBChangeWindow extends JDialog {
         c.gridy = 0;
         infoPanel.add(usernameTField, c);
 
-        passwordLabel = new JLabel("Пароль: ");
+        JLabel passwordLabel = new JLabel("Пароль: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
@@ -60,7 +53,7 @@ public class DBChangeWindow extends JDialog {
         c.gridy = 1;
         infoPanel.add(passwordTField, c);
 
-        dbNameLabel = new JLabel("Наименование БД: ");
+        JLabel dbNameLabel = new JLabel("Наименование БД: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 2;
@@ -72,11 +65,11 @@ public class DBChangeWindow extends JDialog {
         c.gridy = 2;
         infoPanel.add(dbNameTField, c);
 
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-        okButton = new JButton("Ок");
+        JButton okButton = new JButton("Ок");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 config.setProperty("username", usernameTField.getText());
@@ -87,7 +80,7 @@ public class DBChangeWindow extends JDialog {
         });
         buttonPanel.add(okButton);
 
-        cancelButton = new JButton("Отмена");
+        JButton cancelButton = new JButton("Отмена");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 close();

@@ -14,9 +14,6 @@ import java.sql.SQLException;
 public class EntityChooserWindow extends JDialog {
 
     private JTable table;
-    private JPanel buttonPanel;
-    private JButton okButton;
-    private JButton cancelButton;
 
     private EntityController controller;
 
@@ -29,7 +26,7 @@ public class EntityChooserWindow extends JDialog {
     }
 
     private void initComponents() {
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
@@ -53,7 +50,7 @@ public class EntityChooserWindow extends JDialog {
         getContentPane().add(scrollPane);
 
 
-        okButton = new JButton("Ок");
+        JButton okButton = new JButton("Ок");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
@@ -76,7 +73,7 @@ public class EntityChooserWindow extends JDialog {
         });
         buttonPanel.add(okButton);
 
-        cancelButton = new JButton("Отмена");
+        JButton cancelButton = new JButton("Отмена");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 entity = null;

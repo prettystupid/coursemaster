@@ -1,6 +1,6 @@
 package application.utils;
 
-import application.controller.entitycontroller.EntityController;
+import application.controller.entitycontroller.DocumentController;
 import application.controller.entitycontroller.CourseController;
 import application.controller.MainController;
 import application.controller.entitycontroller.NTDController;
@@ -12,7 +12,7 @@ public class PanelFactory {
     public static DocumentPanel createPanel(DocumentType entityType, MainController mainController) {
 
         DocumentPanel panel;
-        EntityController controller;
+        DocumentController controller;
 
         switch (entityType) {
             case COURSE:

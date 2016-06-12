@@ -6,7 +6,7 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import java.sql.SQLException;
 
-public class NTDController extends EntityController {
+public class NTDController extends DocumentController {
 
     public NTDController(MainController mainController) {
         super(mainController);

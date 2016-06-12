@@ -1,6 +1,6 @@
 package application.view.main;
 
-import application.controller.entitycontroller.EntityController;
+import application.controller.entitycontroller.DocumentController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,11 +11,11 @@ import java.sql.SQLException;
 
 public class DocumentPanel extends JPanel{
 
-    private EntityController controller;
+    private DocumentController controller;
 
     private JTable table;
 
-    public DocumentPanel(EntityController controller) {
+    public DocumentPanel(DocumentController controller) {
         super();
         setLayout(new BorderLayout());
         this.controller = controller;
@@ -55,7 +55,6 @@ public class DocumentPanel extends JPanel{
                 }
             }
         });
-        uploadButton.setSize(150,50);
         buttonPanel.add(uploadButton);
 
         JButton downloadButton = new JButton("Выгрузить");
@@ -68,7 +67,6 @@ public class DocumentPanel extends JPanel{
                 }
             }
         });
-        downloadButton.setSize(150,50);
         buttonPanel.add(downloadButton);
 
         final JButton changeButton = new JButton("Изменить");
@@ -87,7 +85,6 @@ public class DocumentPanel extends JPanel{
                 }
             }
         });
-        changeButton.setSize(150,50);
         buttonPanel.add(changeButton);
 
         JButton deleteButton = new JButton("Удалить");
@@ -106,7 +103,6 @@ public class DocumentPanel extends JPanel{
                 }
             }
         });
-        deleteButton.setSize(150,50);
         buttonPanel.add(deleteButton);
 
         JButton updateButton = new JButton("Обновить");
@@ -121,7 +117,6 @@ public class DocumentPanel extends JPanel{
                 }
             }
         });
-        deleteButton.setSize(150,50);
         buttonPanel.add(updateButton);
     }
 

@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class CourseController extends EntityController {
+public class CourseController extends DocumentController {
 
     public CourseController(MainController mainController) {
         super(mainController);

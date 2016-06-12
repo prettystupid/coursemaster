@@ -1,7 +1,6 @@
 package application.view;
 
 import application.model.entity.Document;
-import application.model.entity.course.Course;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,16 +9,9 @@ import java.awt.event.ActionListener;
 
 public class DocumentChangeWindow extends JDialog{
 
-    private JPanel infoPanel;
-    private JLabel uuidLabel;
-    private JLabel versionLabel;
-    private JLabel nameLabel;
     private JTextField uuidTField;
     private JTextField versionTField;
     private JTextField nameTField;
-    private JPanel buttonPanel;
-    private JButton okButton;
-    private JButton cancelButton;
 
     private Document document;
 
@@ -30,13 +22,13 @@ public class DocumentChangeWindow extends JDialog{
     }
 
     private void initComponents() {
-        infoPanel = new JPanel();
+        JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridBagLayout());
         getContentPane().add(infoPanel, BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
 
-        uuidLabel = new JLabel("UUID: ");
+        JLabel uuidLabel = new JLabel("UUID: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
@@ -48,7 +40,7 @@ public class DocumentChangeWindow extends JDialog{
         c.gridy = 0;
         infoPanel.add(uuidTField, c);
 
-        versionLabel = new JLabel("Версия: ");
+        JLabel versionLabel = new JLabel("Версия: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 1;
@@ -60,7 +52,7 @@ public class DocumentChangeWindow extends JDialog{
         c.gridy = 1;
         infoPanel.add(versionTField, c);
 
-        nameLabel = new JLabel("Наименование: ");
+        JLabel nameLabel = new JLabel("Наименование: ");
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 2;
@@ -72,11 +64,11 @@ public class DocumentChangeWindow extends JDialog{
         c.gridy = 2;
         infoPanel.add(nameTField,c);
 
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-        okButton = new JButton("Ок");
+        JButton okButton = new JButton("Ок");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 document.setUuid(uuidTField.getText());
@@ -84,7 +76,7 @@ public class DocumentChangeWindow extends JDialog{
                 try {
                     document.setVersion(Integer.parseInt(versionTField.getText()));
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showConfirmDialog(null, "Версия должна быть натуральным числом", "Ошибка", JOptionPane.CLOSED_OPTION);
+                    JOptionPane.showMessageDialog(null, "Версия должна быть натуральным числом", "Ошибка", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 close();
@@ -92,7 +84,7 @@ public class DocumentChangeWindow extends JDialog{
         });
         buttonPanel.add(okButton);
 
-        cancelButton = new JButton("Отмена");
+        JButton cancelButton = new JButton("Отмена");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 close();

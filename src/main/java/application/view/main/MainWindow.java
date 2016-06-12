@@ -1,8 +1,10 @@
 package application.view.main;
 
 import application.controller.MainController;
+import application.model.entity.Organization;
 import application.utils.PanelFactory;
 import application.model.entity.DocumentType;
+import application.view.OrganizationWindow;
 import org.apache.commons.configuration.ConfigurationException;
 
 import javax.swing.*;
@@ -12,8 +14,7 @@ import java.awt.event.ActionListener;
 
 public class MainWindow extends JFrame{
 
-    JTabbedPane tabbedPane;
-    MainController controller;
+    private MainController controller;
 
     public MainWindow(MainController controller) {
         super("Master");
@@ -23,7 +24,7 @@ public class MainWindow extends JFrame{
 
     private void initComponents() {
 
-        tabbedPane = new JTabbedPane();
+        JTabbedPane tabbedPane = new JTabbedPane();
         getContentPane().add(tabbedPane);
 
         JPanel coursePanel = PanelFactory.createPanel(DocumentType.COURSE, controller);
@@ -40,7 +41,7 @@ public class MainWindow extends JFrame{
         addOrgItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: 09.06.2016
+                initOrganizationWindow();
             }
         });
         mainMenu.add(addOrgItem);
@@ -64,10 +65,13 @@ public class MainWindow extends JFrame{
         mainMenu.add(createDBItem);
 
         setJMenuBar(menuBar);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(1500, 450));
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private void initOrganizationWindow() {
+        OrganizationWindow window = new OrganizationWindow(controller);
     }
 }

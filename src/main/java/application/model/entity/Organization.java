@@ -1,6 +1,5 @@
-package application.model.entity.organization;
+package application.model.entity;
 
-import application.model.entity.IEntity;
 
 public class Organization implements IEntity {
 
@@ -9,6 +8,12 @@ public class Organization implements IEntity {
     private String key;
 
     public Organization(String name, String key) {
+        this.name = name;
+        this.key = key;
+    }
+
+    public Organization(long id, String name, String key) {
+        this.id = id;
         this.name = name;
         this.key = key;
     }

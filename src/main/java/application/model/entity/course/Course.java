@@ -31,7 +31,7 @@ public class Course extends Document {
 
     public Course() {}
 
-    public Course(long id, String uuid, int version, String name, int mistakesAllowed) {
+    public Course(long id, String uuid, long version, String name, int mistakesAllowed) {
         this.id = id;
         this.uuid = uuid;
         this.version = version;

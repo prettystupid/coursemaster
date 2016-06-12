@@ -1,7 +1,8 @@
-package application.controller.entitycontroller;
+package application.controller;
 
-import application.controller.MainController;
-import application.model.entity.organization.Organization;
+import application.controller.entitycontroller.EntityController;
+import application.model.entity.Organization;
+import application.utils.dao.OrganizationDAO;
 import org.apache.commons.configuration.ConfigurationException;
 
 import javax.swing.*;
@@ -13,42 +14,21 @@ public class OrganizationController extends EntityController {
 
     public OrganizationController(MainController mainController) {
         super(mainController);
+        dao = new OrganizationDAO();
     }
 
-    @Override
-    public void upload() {
-
-    }
-
-    @Override
-    public void download() {
+    public void create(String name) {
 
     }
 
-    @Override
-    public void change(Long id) {
-
-    }
-
-    @Override
     public void delete(Long id) throws SQLException, ConfigurationException {
 
     }
 
-    @Override
-    public void update() {
+    public void update() throws SQLException, ConfigurationException {
         DefaultTableModel model = (DefaultTableModel)table.getModel();
         model.setRowCount(0);
-        ArrayList<Organization> organizations = null;
-        try {
-            organizations = dao.getAll();
-        } catch (SQLException e) {
-            createSQLExceptionDialog();
-            return;
-        } catch (Exception e) {
-            createConfigurationExceptionDialog();
-            return;
-        }
+        ArrayList<Organization> organizations = dao.getAll();
         Object[] row = new Object[3];
         for (Organization organization: organizations) {
             row[0] = organization.getId();
@@ -58,8 +38,8 @@ public class OrganizationController extends EntityController {
         }
     }
 
-    @Override
-    public void createTable() {
+    public void createTable() throws SQLException, ConfigurationException {
+
         table.setModel(new DefaultTableModel(
                 new Object [][] {},
                 new String [] {
@@ -72,9 +52,11 @@ public class OrganizationController extends EntityController {
             }
         });
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(250);
         table.getColumnModel().getColumn(2).setPreferredWidth(500);
+        update();
     }
 }

@@ -17,12 +17,6 @@ public abstract class EntityController {
         this.mainController = mainController;
     }
 
-    public abstract void upload() throws SQLException, ConfigurationException;
-
-    public abstract void download();
-
-    public abstract void change(Long id) throws SQLException, ConfigurationException;
-
     public abstract void delete(Long id) throws SQLException, ConfigurationException;
 
     public abstract void update() throws SQLException, ConfigurationException;

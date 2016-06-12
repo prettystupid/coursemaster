@@ -1,77 +1,91 @@
 package application.view;
 
-import application.controller.entitycontroller.OrganizationController;
-import application.model.entity.organization.Organization;
+import application.controller.MainController;
+import application.controller.OrganizationController;
+import application.model.entity.Organization;
 
 import javax.crypto.KeyGenerator;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 public class OrganizationWindow extends JFrame{
 
-    private JPanel infoPanel;
-    private JLabel nameLabel;
-    private JTextField nameTField;
-    private JPanel buttonPanel;
-    private JButton okButton;
-    private JButton cancelButton;
+    private JTable table;
 
     private OrganizationController controller;
 
-    private Organization org;
-
-    public OrganizationWindow() {
+    public OrganizationWindow(MainController controller) {
         super("Организации");
+        this.controller = new OrganizationController(controller);
         initComponents();
     }
 
     private void initComponents() {
-        infoPanel = new JPanel();
-        infoPanel.setLayout(new BorderLayout());
-        getContentPane().add(infoPanel, BorderLayout.CENTER);
+
+        table = new JTable();
+        controller.setTable(table);
+        try {
+            controller.createTable();
+        } catch (SQLException e) {
+            controller.createSQLExceptionDialog();
+        } catch (Exception e) {
+            controller.createConfigurationExceptionDialog();
+        }
+        final DefaultTableModel model = (DefaultTableModel) table.getModel();
 
 
-        nameLabel = new JLabel("Введите название организации: ");
-        infoPanel.add(nameLabel, BorderLayout.NORTH);
+        JScrollPane scrollPane = new JScrollPane(table);
+        getContentPane().add(scrollPane);
 
-        nameTField = new JTextField();
-        infoPanel.add(nameTField, BorderLayout.SOUTH);
-
-        buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-        okButton = new JButton("Ок");
-        okButton.addActionListener(new ActionListener() {
+        JButton createButton = new JButton("Создать");
+        createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                createOrganization(nameTField.getText());
-                close();
+                try {
+                  //  controller.create();
+                } catch (Exception e1) {
+                    controller.createConfigurationExceptionDialog();
+                }
             }
         });
-        buttonPanel.add(okButton);
+        buttonPanel.add(createButton);
 
-        cancelButton = new JButton("Отмена");
-        cancelButton.addActionListener(new ActionListener() {
+        JButton deleteButton = new JButton("Удалить");
+        deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                if (table.getSelectedRow() != -1) {
+                    try {
+                        controller.delete((Long) model.getValueAt(table.getSelectedRow(), 0));
+                    } catch (SQLException e1) {
+                        controller.createSQLExceptionDialog();
+                    } catch (Exception e1) {
+                        controller.createConfigurationExceptionDialog();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Выберите элемент", "Информация", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
-        buttonPanel.add(cancelButton);
+        buttonPanel.add(deleteButton);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setResizable(false);
-        setPreferredSize(new Dimension(600, 100));
+        setPreferredSize(new Dimension(700, 400));
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    private void createOrganization(String name) {
+    /*private createOrganization(String name) {
         Key key = null;
         try {
             key = KeyGenerator.getInstance("DESede").generateKey();
@@ -81,14 +95,6 @@ public class OrganizationWindow extends JFrame{
         }
         byte[] array = key.getEncoded();
         String sKey = Base64.getEncoder().encodeToString(array);
-        org = new Organization(name, sKey);
-    }
-
-    public Organization getOrganization() {
-        return org;
-    }
-
-    private void close() {
-        setVisible(false);
-    }
+        return new Organization(name, sKey);
+    }*/
 }

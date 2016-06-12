@@ -11,20 +11,16 @@ public abstract class DAO<T extends IEntity> {
 
     protected Connection getConnection() throws ConfigurationException, SQLException {
         XMLConfiguration config = new XMLConfiguration("src\\main\\resources\\config.xml");
-        StringBuilder url = new StringBuilder("jdbc:mysql://localhost:3306/");
-        url.append(config.getString("db-name")).append("?useSSL=false&serverTimezone=UTC");
-        Connection connection = DriverManager.getConnection(url.toString(), config.getString("username"), config.getString("password"));
-        return connection;
+        String url = new StringBuilder("jdbc:mysql://localhost:3306/").append(config.getString("db-name")).append("?useSSL=false&serverTimezone=UTC").toString();
+        return DriverManager.getConnection(url, config.getString("username"), config.getString("password"));
     }
 
     protected PreparedStatement createPreparedStatement(Connection connection, String query) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        return preparedStatement;
+        return connection.prepareStatement(query);
     }
 
     protected ResultSet getResultSet(PreparedStatement preparedStatement) throws SQLException {
-        ResultSet resultSet = preparedStatement.executeQuery();
-        return resultSet;
+        return preparedStatement.executeQuery();
     }
 
     protected void close(ResultSet resultSet, PreparedStatement statement, Connection connection) throws SQLException {

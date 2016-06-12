@@ -13,7 +13,7 @@ public class CourseDAO extends DocumentDAO<Course> {
 
     @Override
     public ArrayList<Course> getAll() throws SQLException, ConfigurationException {
-        ArrayList<Course> courses = new ArrayList<Course>();
+        ArrayList<Course> courses = new ArrayList<>();
         Connection connection = getConnection();
         String query = "SELECT * FROM `courses`";
         PreparedStatement statement = createPreparedStatement(connection, query);
@@ -37,7 +37,7 @@ public class CourseDAO extends DocumentDAO<Course> {
             statement.setLong(1, id);
             ResultSet resultSet = getResultSet(statement);
             if (resultSet.next()) {
-                course = new Course(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
+                course = new Course(resultSet.getLong("ID"), resultSet.getString("UUID"), resultSet.getLong("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
             }
             close(resultSet, statement, connection);
         } catch (SQLException e) {
@@ -126,8 +126,7 @@ public class CourseDAO extends DocumentDAO<Course> {
             statement.setLong(2, version);
             ResultSet result = getResultSet(statement);
             if (result.next()) {
-                int id = result.getInt("ID");
-                return id;
+                return result.getInt("ID");
             }
             close(result, statement, connection);
         } catch (SQLException e) {
