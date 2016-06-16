@@ -1,11 +1,10 @@
-package application.controller.entitycontroller;
+package application.controller;
 
-import application.controller.MainController;
 import org.apache.commons.configuration.ConfigurationException;
 
 import java.sql.SQLException;
 
-public abstract class DocumentController extends EntityController{
+public abstract class DocumentController extends EntityController {
 
     public DocumentController(MainController mainController) {
         super(mainController);
@@ -15,6 +14,6 @@ public abstract class DocumentController extends EntityController{
 
     public abstract void upload() throws SQLException, ConfigurationException;
 
-    public abstract void download();
+    public abstract void download(Long id) throws SQLException, ConfigurationException;
 
 }

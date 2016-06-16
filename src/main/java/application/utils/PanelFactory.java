@@ -1,9 +1,9 @@
 package application.utils;
 
-import application.controller.entitycontroller.DocumentController;
-import application.controller.entitycontroller.CourseController;
+import application.controller.DocumentController;
+import application.controller.CourseController;
 import application.controller.MainController;
-import application.controller.entitycontroller.NTDController;
+import application.controller.NTDController;
 import application.model.entity.DocumentType;
 import application.view.main.DocumentPanel;
 

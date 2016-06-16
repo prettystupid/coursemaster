@@ -1,14 +1,17 @@
 package application.controller;
 
-import application.controller.entitycontroller.EntityController;
 import application.model.entity.Organization;
 import application.utils.dao.OrganizationDAO;
 import org.apache.commons.configuration.ConfigurationException;
 
+import javax.crypto.KeyGenerator;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class OrganizationController extends EntityController {
 
@@ -17,12 +20,15 @@ public class OrganizationController extends EntityController {
         dao = new OrganizationDAO();
     }
 
-    public void create(String name) {
-
+    public void create(String name) throws SQLException, ConfigurationException {
+        Organization organization = createOrganization(name);
+        dao.insert(organization);
+        update();
     }
 
     public void delete(Long id) throws SQLException, ConfigurationException {
-
+        dao.delete(id);
+        update();
     }
 
     public void update() throws SQLException, ConfigurationException {
@@ -58,5 +64,18 @@ public class OrganizationController extends EntityController {
         table.getColumnModel().getColumn(1).setPreferredWidth(250);
         table.getColumnModel().getColumn(2).setPreferredWidth(500);
         update();
+    }
+
+    private Organization createOrganization(String name) {
+        Key key = null;
+        try {
+            key = KeyGenerator.getInstance("DESede").generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
+        byte[] array = key.getEncoded();
+        String sKey = Base64.getEncoder().encodeToString(array);
+        return new Organization(name, sKey);
     }
 }

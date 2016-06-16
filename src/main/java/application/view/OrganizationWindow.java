@@ -2,22 +2,19 @@ package application.view;
 
 import application.controller.MainController;
 import application.controller.OrganizationController;
-import application.model.entity.Organization;
 
-import javax.crypto.KeyGenerator;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.Base64;
 
 public class OrganizationWindow extends JFrame{
 
     private JTable table;
+    private JLabel nameLabel;
+    private JTextField nameTField;
 
     private OrganizationController controller;
 
@@ -52,7 +49,14 @@ public class OrganizationWindow extends JFrame{
         createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                  //  controller.create();
+                    String name = JOptionPane.showInputDialog(null, "Введите название организации", "Создать", JOptionPane.INFORMATION_MESSAGE);
+                    if (name == null) {
+                        return;
+                    } else if ("".equals(name)) {
+                        JOptionPane.showMessageDialog(null, "Название организации не может быть пустым", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        controller.create(name);
+                    }
                 } catch (Exception e1) {
                     controller.createConfigurationExceptionDialog();
                 }
@@ -84,17 +88,4 @@ public class OrganizationWindow extends JFrame{
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
-    /*private createOrganization(String name) {
-        Key key = null;
-        try {
-            key = KeyGenerator.getInstance("DESede").generateKey();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return;
-        }
-        byte[] array = key.getEncoded();
-        String sKey = Base64.getEncoder().encodeToString(array);
-        return new Organization(name, sKey);
-    }*/
 }

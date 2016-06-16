@@ -1,22 +1,32 @@
-package application.controller.entitycontroller;
+package application.controller;
 
-import application.controller.MainController;
+import application.model.download.course.DownloadedCourse;
 import application.model.entity.Document;
+import application.model.entity.IEntity;
+import application.model.entity.Organization;
 import application.model.entity.course.Course;
 import application.model.entity.course.CourseInfo;
+import application.utils.Encrypter;
 import application.utils.dao.CourseDAO;
 import application.utils.dao.DocumentDAO;
 import application.view.EntityChooserWindow;
 import application.view.DocumentChangeWindow;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.UUID;
+
+import static com.sun.imageio.plugins.jpeg.JPEG.version;
 
 public class CourseController extends DocumentController {
 
@@ -54,8 +64,40 @@ public class CourseController extends DocumentController {
     }
 
     @Override
-    public void download() {
-
+    public void download(Long id) throws SQLException, ConfigurationException {
+        String stringKey = getKeyByOrg();
+        DownloadedCourse course = ((DownloadedCourse) ((DocumentDAO) dao).getDownloadedObject(id));
+        if (course == null) {
+            JOptionPane.showMessageDialog(null, "Курс не найден", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        JFileChooser directoryChooser = new JFileChooser("C:\\");
+        directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File directory;
+        int ret = directoryChooser.showDialog(null, "Открыть файл");
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            directory = directoryChooser.getSelectedFile();
+        } else {
+            return;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = null;
+        try {
+            jsonString = mapper.writeValueAsString(course);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        byte[] courseBytes = objToBytes(jsonString);
+        byte[] decodedKey = Base64.getDecoder().decode(stringKey);
+        SecretKey key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "DESede");
+        Encrypter encrypter = new Encrypter(key);
+        byte[] result = encrypter.encrypt(courseBytes);
+        try {
+            FileUtils.writeByteArrayToFile(new File(directory + "\\course" + course.getId()+ "\\course.course"), result);
+            FileUtils.writeStringToFile(new File(directory + "\\course" + course.getId()+ "\\key.txt"), stringKey);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -70,7 +112,7 @@ public class CourseController extends DocumentController {
         newCourse.setName(document.getName());
         courseWindow.dispose();
         if (!course.equals(newCourse)) {
-            dao.change(newCourse);
+            ((DocumentDAO) dao).change(newCourse);
             update();
         }
     }
@@ -156,52 +198,13 @@ public class CourseController extends DocumentController {
         return course;
     }
 
-   /*
-
-    public void downloadCourse(String uuid, String version) {
-        String stringKey = getKeyByOrg();
-        int ver = Integer.parseInt(version);
-        DownloadedCourse course = DBConnector.getDownloadedCourse(uuid, ver);
-        if (course == null) {
-            JOptionPane.showMessageDialog(null, "Курс не найден", "Ошибка", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        JFileChooser directoryChooser = new JFileChooser("C:\\");
-        directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        File directory;
-        int ret = directoryChooser.showDialog(null, "Открыть файл");
-        if (ret == JFileChooser.APPROVE_OPTION) {
-            directory = directoryChooser.getSelectedFile();
-        } else {
-            return;
-        }
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
-        try {
-            jsonString = mapper.writeValueAsString(course);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        byte[] courseBytes = objToBytes(jsonString);
-        byte[] decodedKey = Base64.getDecoder().decode(stringKey);
-        SecretKey key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "DESede");
-        Encrypter encrypter = new Encrypter(key);
-        byte[] result = encrypter.encrypt(courseBytes);
-        try {
-            FileUtils.writeByteArrayToFile(new File(directory + "\\course" + course.getId()+ "\\course.course"), result);
-            FileUtils.writeStringToFile(new File(directory + "\\course" + course.getId()+ "\\key.txt"), stringKey);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private String getKeyByOrg() {
         JFrame frame = new JFrame();
-        OrgChooserTableWindow tableWindow = new OrgChooserTableWindow(frame);
-        String key = tableWindow.getKey();
+        EntityChooserWindow tableWindow = new EntityChooserWindow(frame, new OrganizationController(mainController));
+        Organization org = ((Organization) tableWindow.getEntity());
         tableWindow.dispose();
-        return key;
-    }*/
+        return org.getKey();
+    }
 
 
 

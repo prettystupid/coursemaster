@@ -1,6 +1,5 @@
-package application.controller.entitycontroller;
+package application.controller;
 
-import application.controller.MainController;
 import application.utils.dao.NTDDAO;
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -19,7 +18,7 @@ public class NTDController extends DocumentController {
     }
 
     @Override
-    public void download() {
+    public void download(Long id) {
 
     }
 

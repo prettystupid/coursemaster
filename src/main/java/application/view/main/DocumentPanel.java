@@ -1,6 +1,6 @@
 package application.view.main;
 
-import application.controller.entitycontroller.DocumentController;
+import application.controller.DocumentController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -61,7 +61,7 @@ public class DocumentPanel extends JPanel{
         downloadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
-                    controller.download();
+                    controller.download((Long) model.getValueAt(table.getSelectedRow(), 0));
                 } else {
                     JOptionPane.showMessageDialog(null, "Выберите элемент", "Информация", JOptionPane.INFORMATION_MESSAGE);
                 }

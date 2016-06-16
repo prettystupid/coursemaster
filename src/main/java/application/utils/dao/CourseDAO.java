@@ -96,6 +96,8 @@ public class CourseDAO extends DocumentDAO<Course> {
         statement.execute(query);
         query = "DELETE FROM `courses` WHERE ID = " + id;
         statement.execute(query);
+        statement.close();
+        connection.close();
     }
 
     @Override
@@ -117,21 +119,23 @@ public class CourseDAO extends DocumentDAO<Course> {
         close(null, statement, connection);
     }
 
+    @Override
+    public Object getDownloadedObject(Long id) throws SQLException, ConfigurationException {
+        return null;
+    }
+
     public long findMatches(String uuid, long version) throws SQLException, ConfigurationException {
         Connection connection = getConnection();
         String query = "SELECT ID FROM `courses` where UUID = ? AND VERSION = ?;";
         PreparedStatement statement = createPreparedStatement(connection, query);
-        try {
-            statement.setString(1, uuid);
-            statement.setLong(2, version);
-            ResultSet result = getResultSet(statement);
-            if (result.next()) {
-                return result.getInt("ID");
-            }
-            close(result, statement, connection);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        statement.setString(1, uuid);
+        statement.setLong(2, version);
+        ResultSet resultSet = getResultSet(statement);
+        long result = -1;
+        if (resultSet.next()) {
+            result = resultSet.getInt("ID");
         }
-        return -1;
+        close(resultSet, statement, connection);
+        return result;
     }
 }

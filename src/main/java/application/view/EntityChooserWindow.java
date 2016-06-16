@@ -1,6 +1,6 @@
 package application.view;
 
-import application.controller.entitycontroller.EntityController;
+import application.controller.EntityController;
 import application.model.entity.IEntity;
 import org.apache.commons.configuration.ConfigurationException;
 

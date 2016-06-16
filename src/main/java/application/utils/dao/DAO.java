@@ -43,5 +43,4 @@ public abstract class DAO<T extends IEntity> {
 
     public abstract void delete(Long id) throws SQLException, ConfigurationException;
 
-    public abstract void change(T entity) throws SQLException, ConfigurationException;
 }

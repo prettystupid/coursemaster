@@ -1,6 +1,5 @@
-package application.controller.entitycontroller;
+package application.controller;
 
-import application.controller.MainController;
 import application.utils.dao.DAO;
 import org.apache.commons.configuration.ConfigurationException;
 
