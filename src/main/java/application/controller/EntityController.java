@@ -22,6 +22,16 @@ public abstract class EntityController {
 
     public abstract void createTable() throws SQLException, ConfigurationException;
 
+    public void catchException(Exception e) {
+        if (e instanceof SQLException) {
+            createSQLExceptionDialog();
+        } else if ((e instanceof NullPointerException)||(e instanceof ConfigurationException)) {
+            createConfigurationExceptionDialog();
+        } else {
+            throw new RuntimeException();
+        }
+    }
+
     public void createSQLExceptionDialog() {
         int dialogResult = JOptionPane.showConfirmDialog(null, "Соединение с базой данных отсутствует. Изменить настройки базы данных?", "Ошибка", JOptionPane.YES_NO_OPTION);
         if (dialogResult == JOptionPane.YES_OPTION) {

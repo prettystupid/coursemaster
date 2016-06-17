@@ -1,5 +1,8 @@
 package application.utils.dao;
 
+import application.model.download.course.DownloadedAnswer;
+import application.model.download.course.DownloadedCourse;
+import application.model.download.course.DownloadedQuestion;
 import application.model.entity.course.Answer;
 import application.model.entity.course.Course;
 import application.model.entity.course.Question;
@@ -121,7 +124,48 @@ public class CourseDAO extends DocumentDAO<Course> {
 
     @Override
     public Object getDownloadedObject(Long id) throws SQLException, ConfigurationException {
-        return null;
+        DownloadedCourse course = null;
+
+        Connection connection = getConnection();
+        String courseQuery = "SELECT * FROM `courses` WHERE ID = ?";
+        String questionQuery = "SELECT * FROM `questions` WHERE COURSE_ID = ?";
+        String answerQuery = "SELECT * FROM `answers` WHERE COURSE_ID = ? AND QUESTION_NUMBER = ? AND TICKET_NUMBER = ?";
+        PreparedStatement statement = createPreparedStatement(connection, courseQuery);
+
+        statement.setLong(1, id);
+        ResultSet resultSet = getResultSet(statement);
+        if (resultSet.next()) {
+            course = new DownloadedCourse(resultSet.getInt("ID"), resultSet.getString("UUID"), resultSet.getInt("VERSION"), resultSet.getString("NAME"), resultSet.getInt("MISTAKES_ALLOWED"));
+        } else {
+            return course;
+        }
+        ArrayList<DownloadedQuestion> questions = new ArrayList<DownloadedQuestion>();
+        statement = createPreparedStatement(connection, questionQuery);
+        statement.setLong(1, id);
+        resultSet = getResultSet(statement);
+        DownloadedQuestion question;
+        PreparedStatement answerStatement = null;
+        ResultSet answerResult = null;
+        while (resultSet.next()) {
+            question = new DownloadedQuestion(resultSet.getInt("COURSE_ID"), resultSet.getInt("TICKET_NUMBER"), resultSet.getInt("QUESTION_NUMBER"), resultSet.getString("QUESTION"));
+            answerStatement = createPreparedStatement(connection, answerQuery);
+            answerStatement.setLong(1, id);
+            answerStatement.setLong(2, question.getId().getQuestionNumber());
+            answerStatement.setLong(3, question.getId().getTicketNumber());
+            answerResult = getResultSet(answerStatement);
+            ArrayList<DownloadedAnswer> answers = new ArrayList<DownloadedAnswer>();
+            DownloadedAnswer answer;
+            while (answerResult.next()) {
+                answer = new DownloadedAnswer(answerResult.getString("ANSWER"), answerResult.getInt("IS_CORRECT"));
+                answers.add(answer);
+            }
+            question.setAnswers(answers);
+            questions.add(question);
+        }
+        course.setQuestions(questions);
+        close(answerResult, answerStatement, null);
+        close(resultSet, statement, connection);
+        return course;
     }
 
     public long findMatches(String uuid, long version) throws SQLException, ConfigurationException {

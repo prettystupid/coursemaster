@@ -56,12 +56,8 @@ public class EntityChooserWindow extends JDialog {
                 if (table.getSelectedRow() != -1) {
                     try {
                         entity = controller.getDao().getById((Long) model.getValueAt(table.getSelectedRow(), 0));
-                    } catch (SQLException | ConfigurationException ex) {
-                        controller.createSQLExceptionDialog();
-                        entity = null;
-                        return;
                     } catch (Exception ex) {
-                        controller.createConfigurationExceptionDialog();
+                        controller.catchException(ex);
                         entity = null;
                         return;
                     }

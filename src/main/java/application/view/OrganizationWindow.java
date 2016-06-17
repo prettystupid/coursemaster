@@ -30,10 +30,8 @@ public class OrganizationWindow extends JFrame{
         controller.setTable(table);
         try {
             controller.createTable();
-        } catch (SQLException e) {
-            controller.createSQLExceptionDialog();
         } catch (Exception e) {
-            controller.createConfigurationExceptionDialog();
+            controller.catchException(e);
         }
         final DefaultTableModel model = (DefaultTableModel) table.getModel();
 
@@ -70,10 +68,8 @@ public class OrganizationWindow extends JFrame{
                 if (table.getSelectedRow() != -1) {
                     try {
                         controller.delete((Long) model.getValueAt(table.getSelectedRow(), 0));
-                    } catch (SQLException e1) {
-                        controller.createSQLExceptionDialog();
-                    } catch (Exception e1) {
-                        controller.createConfigurationExceptionDialog();
+                    }  catch (Exception ex) {
+                        controller.catchException(ex);
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Выберите элемент", "Информация", JOptionPane.INFORMATION_MESSAGE);

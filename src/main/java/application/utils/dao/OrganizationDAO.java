@@ -37,7 +37,7 @@ public class OrganizationDAO extends DAO<Organization> {
             statement.setLong(1, id);
             ResultSet resultSet = getResultSet(statement);
             if (resultSet.next()) {
-                organization = new Organization(resultSet.getLong("ID"), resultSet.getString("NAME"), resultSet.getString("SECRET_NAME"));
+                organization = new Organization(resultSet.getLong("ID"), resultSet.getString("NAME"), resultSet.getString("SECRET_KEY"));
             }
             close(resultSet, statement, connection);
         } catch (SQLException e) {

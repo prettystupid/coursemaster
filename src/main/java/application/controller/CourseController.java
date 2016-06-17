@@ -197,32 +197,4 @@ public class CourseController extends DocumentController {
         }
         return course;
     }
-
-    private String getKeyByOrg() {
-        JFrame frame = new JFrame();
-        EntityChooserWindow tableWindow = new EntityChooserWindow(frame, new OrganizationController(mainController));
-        Organization org = ((Organization) tableWindow.getEntity());
-        tableWindow.dispose();
-        return org.getKey();
-    }
-
-
-
-    private byte[] objToBytes(Object object) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput out;
-        try {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(object);
-            byte[] result = bos.toByteArray();
-            if (out != null) {
-                out.close();
-            }
-            bos.close();
-            return result;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

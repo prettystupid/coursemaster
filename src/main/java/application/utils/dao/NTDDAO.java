@@ -39,4 +39,9 @@ public class NTDDAO extends DocumentDAO {
     public void change(Document entity) throws SQLException, ConfigurationException {
 
     }
+
+    @Override
+    public Object getDownloadedObject(Long id) throws SQLException, ConfigurationException {
+        return null;
+    }
 }
